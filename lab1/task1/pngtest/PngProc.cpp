@@ -7,6 +7,7 @@ extern "C"
 
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 
 using namespace NPngProc;
 
@@ -368,136 +369,46 @@ size_t NPngProc::readPngFileGray(const char* szFileName
 
 }
 
-size_t NPngProc::writePngFile(const char* szFileName
-			      , unsigned char* pBuf
-			      , size_t	nWidth
-			      , size_t	nHeight
-			      , unsigned int nBPP
-			      )
-{
-	try
-	{
-		FILE *fp;
-		png_structp png_ptr;
-		png_infop info_ptr;
-		//png_colorp palette;
 
-		/* open the file */
-		fp = fopen(szFileName, "wb");
-		if (fp == NULL)
-			throw CPNGExeption("can't create png file");
-			
-		CFileGuard FileGuard(fp);	
+// function for saving an image to a file
 
-		/* Create and initialize the png_struct with the desired error handler
-		* functions.  If you want to use the default stderr and longjump method,
-		* you can supply NULL for the last three parameters.  We also check that
-		* the library version is compatible with the one used at compile time,
-		* in case we are using dynamically linked libraries.  REQUIRED.
-		*/
-		png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-			 0, PNGError, 0);
+void NPngProc::WriteImageToFile(unsigned char* pImage, size_t Width, size_t Height, const char* OutputFileName) {
 
-		if (png_ptr == NULL)
-		{
-			throw CPNGExeption("can't create write png structure");
-		}
-
-		/* Allocate/initialize the image information data.  REQUIRED */
-		info_ptr = png_create_info_struct(png_ptr);
-		if (info_ptr == NULL)
-		{			
-			png_destroy_write_struct(&png_ptr,  png_infopp_NULL);
-			throw CPNGExeption("can't create info structure");
-		}
-
-
-		png_init_io(png_ptr, fp);
-
-		/* This is the hard way */
-
-		/* Set the image information here.  Width and height are up to 2^31,
-		* bit_depth is one of 1, 2, 4, 8, or 16, but valid values also depend on
-		* the color_type selected. color_type is one of PNG_COLOR_TYPE_GRAY,
-		* PNG_COLOR_TYPE_GRAY_ALPHA, PNG_COLOR_TYPE_PALETTE, PNG_COLOR_TYPE_RGB,
-		* or PNG_COLOR_TYPE_RGB_ALPHA.  interlace is either PNG_INTERLACE_NONE or
-		* PNG_INTERLACE_ADAM7, and the compression_type and filter_type MUST
-		* currently be PNG_COMPRESSION_TYPE_BASE and PNG_FILTER_TYPE_BASE. REQUIRED
-		*/
-
-		int nPngColorType = PNG_COLOR_TYPE_GRAY; 
-		int bit_depth = 8;
-		
-		if (nBPP == 24)
-		{
-			nPngColorType = PNG_COLOR_TYPE_RGB;
-		}
-			
-
-		png_set_IHDR(png_ptr, info_ptr, (png_uint_32)nWidth, (png_uint_32)nHeight, bit_depth, nPngColorType,
-			PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
-
-		png_color_8 sig_bit;
-		if (nBPP == 8)
-		{
-			sig_bit.gray = 8;
-			sig_bit.red = 0;
-			sig_bit.green = 0;
-			sig_bit.blue = 0;
-			/* if the image has an alpha channel then */
-			sig_bit.alpha = 0;
-
-		}
-		else
-		{
-			sig_bit.gray = 0;
-			sig_bit.red = 8;
-			sig_bit.green = 8;
-			sig_bit.blue = 8;
-			/* if the image has an alpha channel then */
-			sig_bit.alpha = 0;
-		}
-		/* if we are dealing with a grayscale image then */
-		
-
-		png_set_sBIT(png_ptr, info_ptr, &sig_bit);
-
-
-		/* Write the file header information.  REQUIRED */
-		png_write_info(png_ptr, info_ptr);
-
-		/* pack pixels into bytes */
-		png_set_packing(png_ptr);
-
-		
-
-		size_t nRowWidth = nWidth * nBPP / 8;
-
-		unsigned char* pIn = pBuf;
-		for (unsigned int i = 0; i < nHeight; ++i)
-		{
-			png_write_row(png_ptr, pIn);
-			pIn += nRowWidth;
-		}
-		
-
-
-		/* It is REQUIRED to call this to finish writing the rest of the file */
-		png_write_end(png_ptr, info_ptr);
-
-
-		/* clean up after the write, and free any memory allocated */
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-
-		/* close the file */
-
-		/* that's it */
-		return 0;
+	FILE* file = fopen(OutputFileName, "wb");
+	if (!file) {
+		std::cerr << "Error opening file for writing" << std::endl;
+		return;
 	}
-	catch (CPNGExeption& e)
-	{
-		printf ("NPngProc:readPngFile: Error - %s", e.m_szErrorMessage);
-		return NPngProc::PNG_ERROR;
+
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!png_ptr) {
+		std::cerr << "Error creating PNG structure" << std::endl;
+		fclose(file);
+		return;
 	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr) {
+		std::cerr << "Error creating PNG info structure" << std::endl;
+		png_destroy_write_struct(&png_ptr, NULL);
+		fclose(file);
+		return;
+	}
+
+	png_set_IHDR(png_ptr, info_ptr, Width, Height, 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+	png_init_io(png_ptr, file);
+	png_write_info(png_ptr, info_ptr);
+
+
+	png_bytep* row_pointers = new png_bytep[Height];
+	for (size_t y = 0; y < Height; ++y) {
+		row_pointers[y] = (png_bytep)(pImage + y * Width * 4);
+	}
+	png_write_image(png_ptr, row_pointers);
+
+	png_write_end(png_ptr, NULL);
+
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+	fclose(file);
 }

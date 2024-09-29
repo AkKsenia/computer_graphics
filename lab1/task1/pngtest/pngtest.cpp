@@ -96,50 +96,6 @@ int main(int argc, char* argv[])
 }
 
 
-// function for saving an image to a file
-
-void WriteImageToFile(unsigned char* pImage, size_t Width, size_t Height, const char* OutputFileName) {
-
-	FILE* file = fopen(OutputFileName, "wb");
-	if (!file) {
-		std::cerr << "Error opening file for writing" << std::endl;
-		return;
-	}
-
-	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (!png_ptr) {
-		std::cerr << "Error creating PNG structure" << std::endl;
-		fclose(file);
-		return;
-	}
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if (!info_ptr) {
-		std::cerr << "Error creating PNG info structure" << std::endl;
-		png_destroy_write_struct(&png_ptr, NULL);
-		fclose(file);
-		return;
-	}
-
-	png_set_IHDR(png_ptr, info_ptr, Width, Height, 8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-	png_init_io(png_ptr, file);
-	png_write_info(png_ptr, info_ptr);
-
-
-	png_bytep* row_pointers = new png_bytep[Height];
-	for (size_t y = 0; y < Height; ++y) {
-		row_pointers[y] = (png_bytep)(pImage + y * Width * 4);
-	}
-	png_write_image(png_ptr, row_pointers);
-
-	png_write_end(png_ptr, NULL);
-
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-	fclose(file);
-}
-
-
 // the implementation of obtaining a round halftone image
 
 void HalftoneCircularImage(unsigned char* pOut,
@@ -184,7 +140,7 @@ void HalftoneCircularImage(unsigned char* pOut,
 		}
 
 		// save it to a file
-		WriteImageToFile(pOut, nWidth1, nHeight1, OutputFileName);
+		NPngProc::WriteImageToFile(pOut, nWidth1, nHeight1, OutputFileName);
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Exception caught: " << e.what() << std::endl;

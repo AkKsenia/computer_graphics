@@ -85,10 +85,10 @@ int main(int argc, char* argv[])
 
 	size_t nWidth1, nHeight1, nWidth2, nHeight2;
 	unsigned int nBPP;
+	nBPP = 32;
 
-	size_t nRetSize1 = NPngProc::readPngFileGray(szInputFileName1, pInputBits1, &nWidth1, &nHeight1/*, &nBPP*/);
-	size_t nRetSize2 = NPngProc::readPngFileGray(szInputFileName2, pInputBits2, &nWidth2, &nHeight2/*, &nBPP*/);
-	nBPP = 8;
+	size_t nRetSize1 = NPngProc::readPngFileGray(szInputFileName1, pInputBits1, &nWidth1, &nHeight1);
+	size_t nRetSize2 = NPngProc::readPngFileGray(szInputFileName2, pInputBits2, &nWidth2, &nHeight2);
 
 	HalftoneCircularImage(pOutputBits2, pInputBits1, pInputBits2, nWidth1, nHeight1, nWidth2, nHeight2, szOutputFileName);
 

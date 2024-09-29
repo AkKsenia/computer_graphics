@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 
     BlendImages(pOutputBits, pInputBits1, pInputBits2, pInputBits3, nWidth1, nHeight1, nWidth2, nHeight2, nWidth3, nHeight3, Normal, szOutputFileName);
 
-	return 0;
+    return 0;
 }
 
 

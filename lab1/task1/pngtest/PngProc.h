@@ -27,19 +27,16 @@ namespace NPngProc
 
 	};
 
-	
 	size_t readPngFile(const char* szFileName
-						, unsigned char* pBuf
-						, size_t*	pWidth
-						, size_t*	pHeight
-						, unsigned int* pBPP
-						);
+		, unsigned char* pBuf
+		, size_t*	pWidth
+		, size_t*	pHeight
+	        , unsigned int* pBPP);
 
 	size_t readPngFileGray(const char* szFileName
 		, unsigned char* pBuf
 		, size_t*	pWidth
-		, size_t*	pHeight
-		);
+		, size_t*	pHeight);
 
 	void WriteImageToFile(unsigned char* pImage
 		, size_t Width

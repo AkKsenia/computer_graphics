@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdexcept>
-#include <png.h>
 
 
 void HalftoneCircularImage(unsigned char* pOut,

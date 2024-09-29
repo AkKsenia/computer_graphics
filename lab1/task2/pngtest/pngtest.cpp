@@ -216,4 +216,5 @@ void BlendImages(unsigned char* pOut,
     catch (const std::exception& e) {
         std::cerr << "Exception caught: " << e.what() << std::endl;
     }
+    return;
 }

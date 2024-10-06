@@ -2,7 +2,7 @@
 #include "stucki.h"
 
 
-// implementation of the transformation of an 8 bpp rgb image into n bpp (n < 8) using the Stucki algorithm
+// implementation of the transformation of an 8 bpp grayscale image into n bpp (n < 8) using the Stucki algorithm
 void stucki_dithering_grayscale(Mat& img, int n) {
 
     Mat out_img = Mat::zeros(img.size(), CV_8U);

@@ -114,8 +114,8 @@ Mat perspectiveProjection(float k) {
         0, 0, 0, 1);
 }
 
-// функция для построения параллельной проекции на плоскость z = 0
-void drawParallelProjection(Mat& img, const vector<Point3f>& parallelepipedVertices, const Mat& transformationMatrix) {
+// функция для построения проекций на плоскость z = 0
+void drawProjection(Mat& img, const vector<Point3f>& parallelepipedVertices, const Mat& transformationMatrix) {
     vector<Point2f> projectedPoints;
 
     // применяем матрицу преобразования к каждой вершине параллелепипеда
@@ -145,6 +145,56 @@ void drawParallelProjection(Mat& img, const vector<Point3f>& parallelepipedVerti
     }
 }
 
+// функция для удаления невидимых граней (ну и построения проекций)
+void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, const Mat& transformationMatrix) {
+    vector<Point2f> projectedPoints;
+
+    // применяем матрицу преобразования к каждой вершине параллелепипеда
+    for (const auto& vertex : parallelepipedVertices) {
+        Mat pointMat = (Mat_<float>(4, 1) << vertex.x, vertex.y, vertex.z, 1);
+        Mat transformedPoint = transformationMatrix.t() * pointMat;
+
+        // нормализуем координаты
+        float H = transformedPoint.at<float>(3);
+        Point2f projectedPoint(transformedPoint.at<float>(0) / H, transformedPoint.at<float>(1) / H);
+        projectedPoints.push_back(projectedPoint);
+    }
+
+    // определяем грани параллелепипеда 
+    // для каждой грани нормаль направляется внутрь тела, тогда по правилу правой руки получаем 4-ки вершин:
+    vector<vector<int>> faces = {
+        {2, 3, 7, 6},
+        {0, 4, 5, 1},
+        {4, 6, 7, 5},
+        {0, 1, 3, 2},
+        {1, 5, 7, 3},
+        {0, 2, 6, 4},
+    };
+
+    // вектор направления наблюдения
+    Vec3f v(0, 0, -1);
+
+    for (const auto& face : faces) {
+        // вычисляем нормаль к грани
+        Vec3f ab = Vec3f(projectedPoints[face[1]].x - projectedPoints[face[0]].x,
+            projectedPoints[face[1]].y - projectedPoints[face[0]].y, 0);
+        Vec3f ac = Vec3f(projectedPoints[face[2]].x - projectedPoints[face[0]].x,
+            projectedPoints[face[2]].y - projectedPoints[face[0]].y, 0);
+        Vec3f normal = ab.cross(ac);
+        normal = normal / norm(normal);
+
+        // проверяем видимость грани
+        if (normal.dot(v) > 0) {
+            // если грань видима, рисуем ее
+            for (size_t i = 0; i < face.size(); ++i) {
+                Line(img, projectedPoints[face[i]].x + 400, projectedPoints[face[i]].y + 300,
+                    projectedPoints[face[(i + 1) % face.size()]].x + 400, projectedPoints[face[(i + 1) % face.size()]].y + 300, 0xB4A7D6);
+            }
+        }
+    }
+}
+
+
 int main() {
     Mat img(600, 800, CV_8UC3, Scalar(255, 255, 255));
 
@@ -163,35 +213,47 @@ int main() {
 
     // ортографическая проекция
     //Mat orthographicProjectionMatrix = orthographicProjection();
-    //drawParallelProjection(img, parallelepipedVertices, orthographicProjectionMatrix);
+    //drawProjection(img, parallelepipedVertices, orthographicProjectionMatrix);
 
     // свободная проекция
     //Mat cavalierProjectionMatrix = obliqueProjection(cos(M_PI / 4), cos(M_PI / 4));
-    //drawParallelProjection(img, parallelepipedVertices, cavalierProjectionMatrix);
+    //drawProjection(img, parallelepipedVertices, cavalierProjectionMatrix);
 
     // кабинетная проекция
     //Mat cabinetProjectionMatrix = obliqueProjection(0.5 * cos(M_PI / 4), 0.5 * cos(M_PI / 4));
-    //drawParallelProjection(img, parallelepipedVertices, cabinetProjectionMatrix);
+    //drawProjection(img, parallelepipedVertices, cabinetProjectionMatrix);
 
     // изометричесая проекция
     //Mat isometricProjectionMatrix = axonometricProjection(45, 35.26);
-    //drawParallelProjection(img, parallelepipedVertices, isometricProjectionMatrix);
+    //drawProjection(img, parallelepipedVertices, isometricProjectionMatrix);
 
     // диаметрическая проекция
     //Mat diametricProjectionMatrix = axonometricProjection(90, 45);
-    //drawParallelProjection(img, parallelepipedVertices, diametricProjectionMatrix);
+    //drawProjection(img, parallelepipedVertices, diametricProjectionMatrix);
 
     // __TASK 2__
 
-    Mat perspectiveProjectionMatrix = perspectiveProjection(0.002);
-    drawParallelProjection(img, parallelepipedVertices, perspectiveProjectionMatrix);
+    //Mat perspectiveProjectionMatrix = perspectiveProjection(0.002);
+    //drawProjection(img, parallelepipedVertices, perspectiveProjectionMatrix);
+
+    // __TASK 3__
+
+    // свободная проекция
+    //Mat cavalierProjectionMatrix = obliqueProjection(cos(M_PI / 4), cos(M_PI / 4));
+    //drawVisibleFaces(img, parallelepipedVertices, cavalierProjectionMatrix);
+
+    // кабинетная проекция
+    //Mat cabinetProjectionMatrix = obliqueProjection(0.5 * cos(M_PI / 4), 0.5 * cos(M_PI / 4));
+    //drawVisibleFaces(img, parallelepipedVertices, cabinetProjectionMatrix);
+
+    // __TASK 4__
 
 
     // отображаем изображение
     imshow("Projection of Parallelepiped", img);
     waitKey(0);
 
-    imwrite("perspectiveProjection.png", img);
+    imwrite("cabinetProjection_visible_faces.png", img);
 
     return 0;
 }

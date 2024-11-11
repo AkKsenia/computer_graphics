@@ -2,7 +2,7 @@
 #include "parallel.h"
 
 
-// С„СѓРЅРєС†РёСЏ РґР»СЏ РѕСЂС‚РѕРіСЂР°С„РёС‡РµСЃРєРѕР№ РїСЂРѕРµРєС†РёРё РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ z = 0
+// функция для ортографической проекции на плоскость z = 0
 Mat orthographicProjection() {
     return (Mat_<double>(4, 4) <<
         1, 0, 0, 0,
@@ -11,7 +11,7 @@ Mat orthographicProjection() {
         0, 0, 0, 1);
 }
 
-// С„СѓРЅРєС†РёСЏ РґР»СЏ Р°РєСЃРѕРЅРѕРјРµС‚СЂРёС‡РµСЃРєРѕР№ РїСЂРѕРµРєС†РёРё РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ z = 0
+// функция для аксонометрической проекции на плоскость z = 0
 Mat axonometricProjection(double phi, double theta) {
 
     Mat first = (Mat_<double>(4, 4) <<
@@ -26,16 +26,10 @@ Mat axonometricProjection(double phi, double theta) {
         0, -sin(theta), cos(theta), 0,
         0, 0, 0, 1);
 
-    Mat third = (Mat_<double>(4, 4) <<
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 1);
-
-    return  first * second * third;
+    return  first * second * orthographicProjection();
 }
 
-// С„СѓРЅРєС†РёСЏ РґР»СЏ РЅР°РєР»РѕРЅРЅРѕР№ РїСЂРѕРµРєС†РёРё РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ z = 0
+// функция для наклонной проекции на плоскость z = 0
 Mat obliqueProjection(double h, double i) {
     Mat first = (Mat_<double>(4, 4) <<
         1, 0, 0, 0,
@@ -43,11 +37,5 @@ Mat obliqueProjection(double h, double i) {
         h, i, 1, 0,
         0, 0, 0, 1);
 
-    Mat second = (Mat_<double>(4, 4) <<
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 1);
-
-    return  first * second;
+    return  first * orthographicProjection();
 }

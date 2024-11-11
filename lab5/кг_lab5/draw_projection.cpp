@@ -3,16 +3,16 @@
 #include "draw_projection.h"
 
 
-// функция для построения проекций на плоскость z = 0
+// С„СѓРЅРєС†РёСЏ РґР»СЏ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїСЂРѕРµРєС†РёР№ РЅР° РїР»РѕСЃРєРѕСЃС‚СЊ z = 0
 void drawProjection(Mat& img, const vector<Point3f>& parallelepipedVertices, const Mat& transformationMatrix) {
     vector<Point2f> projectedPoints;
 
-    // применяем матрицу преобразования к каждой вершине параллелепипеда
+    // РїСЂРёРјРµРЅСЏРµРј РјР°С‚СЂРёС†Сѓ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ Рє РєР°Р¶РґРѕР№ РІРµСЂС€РёРЅРµ РїР°СЂР°Р»Р»РµР»РµРїРёРїРµРґР°
     for (const auto& vertex : parallelepipedVertices) {
         Mat pointMat = (Mat_<double>(4, 1) << vertex.x, vertex.y, vertex.z, 1);
         Mat transformedPoint = transformationMatrix.t() * pointMat;
 
-        // нормализуем координаты
+        // РЅРѕСЂРјР°Р»РёР·СѓРµРј РєРѕРѕСЂРґРёРЅР°С‚С‹
         double H = transformedPoint.at<double>(3);
         Point2f projectedPoint(transformedPoint.at<double>(0) / H, transformedPoint.at<double>(1) / H);
         projectedPoints.push_back(projectedPoint);

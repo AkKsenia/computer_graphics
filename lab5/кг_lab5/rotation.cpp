@@ -2,7 +2,7 @@
 #include "rotation.h"
 
 
-// функция для создания матрицы поворота
+// С„СѓРЅРєС†РёСЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РјР°С‚СЂРёС†С‹ РїРѕРІРѕСЂРѕС‚Р°
 Mat createRotationMatrix(double angle, double x, double y, double z) {
     double n = sqrt(x * x + y * y + z * z);
     double nx = x / n;

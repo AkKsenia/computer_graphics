@@ -145,7 +145,7 @@ void drawProjection(Mat& img, const vector<Point3f>& parallelepipedVertices, con
     }
 }
 
-// функция для удаления невидимых граней (ну и построения проекций)
+// функция для удаления невидимых граней (после построения проекций)
 void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, const Mat& transformationMatrix) {
     vector<Point2f> projectedPoints;
 
@@ -171,6 +171,8 @@ void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, c
         {0, 2, 6, 4},
     };
 
+    // алгоритм back face culling:
+
     // вектор направления наблюдения
     Vec3f v(0, 0, -1);
 
@@ -192,6 +194,23 @@ void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, c
             }
         }
     }
+}
+
+// функция для создания матрицы поворота
+Mat createRotationMatrix(float angle, float x, float y, float z) {
+    float n = sqrt(x * x + y * y + z * z);
+    float nx = x / n;
+    float ny = y / n;
+    float nz = z / n;
+
+    float cosAngle = cos(angle);
+    float sinAngle = sin(angle);
+
+    return (Mat_<float>(4, 4) <<
+        cosAngle + nx * nx * (1 - cosAngle), nx * ny * (1 - cosAngle) + nz * sinAngle, nx * nz * (1 - cosAngle) - ny * sinAngle, 0,
+        ny * nx * (1 - cosAngle) - nz * sinAngle, cosAngle + ny * ny * (1 - cosAngle), ny * nz * (1 - cosAngle) + nx * sinAngle, 0,
+        nz * nx * (1 - cosAngle) + ny * sinAngle, nz * ny * (1 - cosAngle) - nx * sinAngle, cosAngle + nz * nz * (1 - cosAngle), 0,
+        0, 0, 0, 1);
 }
 
 
@@ -248,12 +267,32 @@ int main() {
 
     // __TASK 4__
 
+    //VideoWriter video("rotating_parallelepiped_perspective.avi", VideoWriter::fourcc('M', 'J', 'P', 'G'), 30, Size(800, 600));
+    VideoWriter video("rotating_parallelepiped_parallel.avi", VideoWriter::fourcc('M', 'J', 'P', 'G'), 30, Size(800, 600));
+    float angle = 0.0f;
+    float rotationAxisX = 1.0f, rotationAxisY = 1.0f, rotationAxisZ = 1.0f;
+
+    while (true) {
+        img.setTo(Scalar(255, 255, 255)); 
+        Mat rotationMatrix = createRotationMatrix(angle, rotationAxisX, rotationAxisY, rotationAxisZ);
+        //Mat perspectiveProjectionMatrix = perspectiveProjection(0.002);
+        //drawProjection(img, parallelepipedVertices, rotationMatrix * perspectiveProjectionMatrix);
+        Mat cavalierProjectionMatrix = obliqueProjection(cos(M_PI / 4), cos(M_PI / 4));
+        drawProjection(img, parallelepipedVertices, rotationMatrix * cavalierProjectionMatrix);
+
+        video.write(img); 
+        imshow("Rotating Parallelepiped", img);
+        angle += 0.01f; 
+        if (waitKey(10) >= 0) break;
+    }
+
+    video.release();
 
     // отображаем изображение
-    imshow("Projection of Parallelepiped", img);
-    waitKey(0);
+    //imshow("Projection of Parallelepiped", img);
+    //waitKey(0);
 
-    imwrite("cabinetProjection_visible_faces.png", img);
+    //imwrite("cabinetProjection_visible_faces.png", img);
 
     return 0;
 }

@@ -3,23 +3,23 @@
 #include "back_face_culling.h"
 
 
-// функция для удаления невидимых ребер (после построения проекций)
+// С„СѓРЅРєС†РёСЏ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ РЅРµРІРёРґРёРјС‹С… СЂРµР±РµСЂ (РїРѕСЃР»Рµ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїСЂРѕРµРєС†РёР№)
 void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, const Mat& transformationMatrix) {
     vector<Point2f> projectedPoints;
 
-    // применяем матрицу преобразования к каждой вершине параллелепипеда
+    // РїСЂРёРјРµРЅСЏРµРј РјР°С‚СЂРёС†Сѓ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ Рє РєР°Р¶РґРѕР№ РІРµСЂС€РёРЅРµ РїР°СЂР°Р»Р»РµР»РµРїРёРїРµРґР°
     for (const auto& vertex : parallelepipedVertices) {
         Mat pointMat = (Mat_<double>(4, 1) << vertex.x, vertex.y, vertex.z, 1);
         Mat transformedPoint = transformationMatrix.t() * pointMat;
 
-        // нормализуем координаты
+        // РЅРѕСЂРјР°Р»РёР·СѓРµРј РєРѕРѕСЂРґРёРЅР°С‚С‹
         double H = transformedPoint.at<double>(3);
         Point2f projectedPoint(transformedPoint.at<double>(0) / H, transformedPoint.at<double>(1) / H);
         projectedPoints.push_back(projectedPoint);
     }
 
-    // определяем грани параллелепипеда 
-    // для каждой грани нормаль направляется внутрь тела, тогда по правилу правой руки получаем 4-ки вершин:
+    // РѕРїСЂРµРґРµР»СЏРµРј РіСЂР°РЅРё РїР°СЂР°Р»Р»РµР»РµРїРёРїРµРґР° 
+    // РґР»СЏ РєР°Р¶РґРѕР№ РіСЂР°РЅРё РЅРѕСЂРјР°Р»СЊ РЅР°РїСЂР°РІР»СЏРµС‚СЃСЏ РІРЅСѓС‚СЂСЊ С‚РµР»Р°, С‚РѕРіРґР° РїРѕ РїСЂР°РІРёР»Сѓ РїСЂР°РІРѕР№ СЂСѓРєРё РїРѕР»СѓС‡Р°РµРј 4-РєРё РІРµСЂС€РёРЅ:
     vector<vector<int>> faces = {
         {2, 3, 7, 6},
         {0, 4, 5, 1},
@@ -29,13 +29,13 @@ void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, c
         {0, 2, 6, 4},
     };
 
-    // алгоритм back face culling:
+    // Р°Р»РіРѕСЂРёС‚Рј back face culling:
 
-    // вектор направления наблюдения
+    // РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ РЅР°Р±Р»СЋРґРµРЅРёСЏ
     Vec3f v(0, 0, -1);
 
     for (const auto& face : faces) {
-        // вычисляем нормаль к грани
+        // РІС‹С‡РёСЃР»СЏРµРј РЅРѕСЂРјР°Р»СЊ Рє РіСЂР°РЅРё
         Vec3f ab = Vec3f(projectedPoints[face[1]].x - projectedPoints[face[0]].x,
             projectedPoints[face[1]].y - projectedPoints[face[0]].y, 0);
         Vec3f ac = Vec3f(projectedPoints[face[2]].x - projectedPoints[face[0]].x,
@@ -43,9 +43,9 @@ void drawVisibleFaces(Mat& img, const vector<Point3f>& parallelepipedVertices, c
         Vec3f normal = ab.cross(ac);
         normal = normal / norm(normal);
 
-        // проверяем видимость грани
+        // РїСЂРѕРІРµСЂСЏРµРј РІРёРґРёРјРѕСЃС‚СЊ РіСЂР°РЅРё
         if (normal.dot(v) > 0) {
-            // если грань видима, рисуем ее
+            // РµСЃР»Рё РіСЂР°РЅСЊ РІРёРґРёРјР°, СЂРёСЃСѓРµРј РµРµ
             for (size_t i = 0; i < face.size(); ++i) {
                 Line(img, projectedPoints[face[i]].x + 400, projectedPoints[face[i]].y + 300,
                     projectedPoints[face[(i + 1) % face.size()]].x + 400, projectedPoints[face[(i + 1) % face.size()]].y + 300, 0xB4A7D6);

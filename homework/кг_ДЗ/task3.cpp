@@ -51,10 +51,12 @@ void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColor
     vector<Cuboid> cuboids;
     cuboids.emplace_back(colors);
 
+    // выполняем для новых кубов до тех пор, пока их число не станет >= необходимого количества цветов
     while (cuboids.size() < numColors) {
         Cuboid current = cuboids.back();
         cuboids.pop_back();
 
+        // делим куб на два новых:
         int dim = current.longestDimension();
         double medianValue = current.median(dim);
 
@@ -72,6 +74,7 @@ void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColor
             cuboids.emplace_back(rightColors);
     }
 
+    // составляем итоговую палитру из цветов, равных средним арифметическим точек внутри кубов
     for (const auto& cuboid : cuboids) {
         Vec3d averageColor(0, 0, 0);
         for (const auto& color : cuboid.colors)

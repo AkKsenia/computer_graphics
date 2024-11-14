@@ -16,10 +16,10 @@ void floodFill8(Mat& img, int x, int y, int newColor, int oldColor) {
     static const int dx[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
     static const int dy[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
 
-    if (oldColor == newColor) return; // если цвет уже совпадает
+    if (oldColor == newColor) return; // РµСЃР»Рё С†РІРµС‚ СѓР¶Рµ СЃРѕРІРїР°РґР°РµС‚
 
     stack<pair<int, int>> stack;
-    stack.push({ x, y }); // помещаем затравку в стек
+    stack.push({ x, y }); // РїРѕРјРµС‰Р°РµРј Р·Р°С‚СЂР°РІРєСѓ РІ СЃС‚РµРє
 
     while (!stack.empty()) {
         pair<int, int> point = stack.top();

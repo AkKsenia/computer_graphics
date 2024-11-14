@@ -6,6 +6,7 @@
 #include <iostream> 
 #include <stack>
 #include <cmath>
+#include <vector>
 
 using namespace cv;
 using namespace std;

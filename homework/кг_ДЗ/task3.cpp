@@ -3,9 +3,9 @@
 
 
 struct Cuboid {
-    Vec3d min; // минимум по RGB
-    Vec3d max; // максимум по RGB
-    vector<Vec3b> colors; // цвета в кубе
+    Vec3d min; // РјРёРЅРёРјСѓРј РїРѕ RGB
+    Vec3d max; // РјР°РєСЃРёРјСѓРј РїРѕ RGB
+    vector<Vec3b> colors; // С†РІРµС‚Р° РІ РєСѓР±Рµ
 
     Cuboid(const vector<Vec3b>& points) {
         if (points.empty()) return;
@@ -36,7 +36,7 @@ struct Cuboid {
         vector<double> values;
         for (const auto& color : colors)
             values.push_back(color[dim]);
-        sort(values.begin(), values.end());//
+        sort(values.begin(), values.end());
 
         size_t n = values.size();
         if (n % 2 == 0)
@@ -99,7 +99,7 @@ Mat quantizeImage(const Mat& img, int numColors) {
     for (int y = 0; y < img.rows; ++y) {
         for (int x = 0; x < img.cols; ++x) {
             Vec3b color = img.at<Vec3b>(y, x);
-            // находим ближайший цвет в палитре
+            // РЅР°С…РѕРґРёРј Р±Р»РёР¶Р°Р№С€РёР№ С†РІРµС‚ РІ РїР°Р»РёС‚СЂРµ
             int closestIndex = 0;
             double closestDistance = numeric_limits<double>::max();
 

@@ -102,6 +102,7 @@ Mat quantizeImage(const Mat& img, int numColors) {
     for (int y = 0; y < img.rows; ++y) {
         for (int x = 0; x < img.cols; ++x) {
             Vec3b color = img.at<Vec3b>(y, x);
+            
             // находим ближайший цвет в палитре
             int closestIndex = 0;
             double closestDistance = numeric_limits<double>::max();
@@ -113,7 +114,6 @@ Mat quantizeImage(const Mat& img, int numColors) {
                     closestIndex = i;
                 }
             }
-
             output_img.at<Vec3b>(y, x) = palette[closestIndex];
         }
     }

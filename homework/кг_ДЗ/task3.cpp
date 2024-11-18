@@ -3,9 +3,9 @@
 
 
 struct Cuboid {
-    Vec3b min; // минимум по RGB
-    Vec3b max; // максимум по RGB
-    vector<Vec3b> colors; // цвета в кубе
+    Vec3b min; // РјРёРЅРёРјСѓРј РїРѕ RGB
+    Vec3b max; // РјР°РєСЃРёРјСѓРј РїРѕ RGB
+    vector<Vec3b> colors; // С†РІРµС‚Р° РІ РєСѓР±Рµ
 
     Cuboid(const vector<Vec3b>& points) {
         if (points.empty()) return;
@@ -50,7 +50,7 @@ void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColor
     cuboids.emplace_back(colors);
     int cuboids_size = cuboids.size();
 
-    // выполняем для новых кубов до тех пор, пока их число не станет >= необходимого количества цветов
+    // РІС‹РїРѕР»РЅСЏРµРј РґР»СЏ РЅРѕРІС‹С… РєСѓР±РѕРІ РґРѕ С‚РµС… РїРѕСЂ, РїРѕРєР° РёС… С‡РёСЃР»Рѕ РЅРµ СЃС‚Р°РЅРµС‚ >= РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° С†РІРµС‚РѕРІ
     while (cuboids_size < numColors) {
         if (cuboids.empty()) break;
 
@@ -58,7 +58,7 @@ void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColor
         cuboids.pop_back();
         --cuboids_size;
 
-        // делим куб на два новых:
+        // РґРµР»РёРј РєСѓР± РЅР° РґРІР° РЅРѕРІС‹С…:
         int dim = current.longestDimension();
         int medianValue = current.median(dim);
 
@@ -88,7 +88,7 @@ void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColor
     reverse(popped.begin(), popped.end());
     cuboids.insert(cuboids.end(), popped.begin(), popped.end());
 
-    // составляем итоговую палитру из цветов, равных средним арифметическим точек внутри кубов
+    // СЃРѕСЃС‚Р°РІР»СЏРµРј РёС‚РѕРіРѕРІСѓСЋ РїР°Р»РёС‚СЂСѓ РёР· С†РІРµС‚РѕРІ, СЂР°РІРЅС‹С… СЃСЂРµРґРЅРёРј Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёРј С‚РѕС‡РµРє РІРЅСѓС‚СЂРё РєСѓР±РѕРІ
     for (const auto& cuboid : cuboids) {
         Vec3d averageColor(0, 0, 0);
         for (const auto& color : cuboid.colors)
@@ -117,7 +117,7 @@ Mat quantizeImage(const Mat& img, int numColors) {
         for (int x = 0; x < img.cols; ++x) {
             Vec3b color = img.at<Vec3b>(y, x);
 
-            // находим ближайший цвет в палитре
+            // РЅР°С…РѕРґРёРј Р±Р»РёР¶Р°Р№С€РёР№ С†РІРµС‚ РІ РїР°Р»РёС‚СЂРµ
             int closestIndex = 0;
             double closestDistance = numeric_limits<double>::max();
 

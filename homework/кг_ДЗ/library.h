@@ -5,6 +5,8 @@
 #include <stack>
 #include <cmath>
 #include <vector>
+#include <algorithm>
+#include <limits>
 
 using namespace cv;
 using namespace std;

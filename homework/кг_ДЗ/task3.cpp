@@ -3,78 +3,92 @@
 
 
 struct Cuboid {
-    Vec3d min; // РјРёРЅРёРјСѓРј РїРѕ RGB
-    Vec3d max; // РјР°РєСЃРёРјСѓРј РїРѕ RGB
-    vector<Vec3b> colors; // С†РІРµС‚Р° РІ РєСѓР±Рµ
+    Vec3b min; // минимум по RGB
+    Vec3b max; // максимум по RGB
+    vector<Vec3b> colors; // цвета в кубе
 
     Cuboid(const vector<Vec3b>& points) {
         if (points.empty()) return;
-        min = Vec3d(255, 255, 255);
-        max = Vec3d(0, 0, 0);
+        min = Vec3b(255, 255, 255);
+        max = Vec3b(0, 0, 0);
         colors = points;
 
         for (const auto& color : colors) {
-            min[0] = std::min(min[0], (double)color[0]);
-            min[1] = std::min(min[1], (double)color[1]);
-            min[2] = std::min(min[2], (double)color[2]);
-            max[0] = std::max(max[0], (double)color[0]);
-            max[1] = std::max(max[1], (double)color[1]);
-            max[2] = std::max(max[2], (double)color[2]);
+            min[0] = std::min(min[0], color[0]);
+            min[1] = std::min(min[1], color[1]);
+            min[2] = std::min(min[2], color[2]);
+            max[0] = std::max(max[0], color[0]);
+            max[1] = std::max(max[1], color[1]);
+            max[2] = std::max(max[2], color[2]);
         }
     }
 
     int longestDimension() {
-        double lengthX = max[0] - min[0];
-        double lengthY = max[1] - min[1];
-        double lengthZ = max[2] - min[2];
+        int lengthX = max[0] - min[0];
+        int lengthY = max[1] - min[1];
+        int lengthZ = max[2] - min[2];
         if (lengthX >= lengthY && lengthX >= lengthZ) return 0;
         if (lengthY >= lengthX && lengthY >= lengthZ) return 1;
         return 2;
     }
 
-    double median(int dim) {
-        vector<double> values;
+    int median(int dim) {
+        vector<int> values;
         for (const auto& color : colors)
             values.push_back(color[dim]);
-        sort(values.begin(), values.end());
 
         size_t n = values.size();
-        if (n % 2 == 0)
-            return (values[n / 2 - 1] + values[n / 2]) / 2.0;
-        else
-            return values[n / 2];
+
+        nth_element(values.begin(), values.begin() + n / 2, values.end());
+        return values[n / 2];
     }
 };
 
 
 void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColors) {
-    vector<Cuboid> cuboids;
+    vector<Cuboid> cuboids, popped;
     cuboids.emplace_back(colors);
+    int cuboids_size = cuboids.size();
 
-    // РІС‹РїРѕР»РЅСЏРµРј РґР»СЏ РЅРѕРІС‹С… РєСѓР±РѕРІ РґРѕ С‚РµС… РїРѕСЂ, РїРѕРєР° РёС… С‡РёСЃР»Рѕ РЅРµ СЃС‚Р°РЅРµС‚ >= РЅРµРѕР±С…РѕРґРёРјРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° С†РІРµС‚РѕРІ
-    while (cuboids.size() < numColors) {
+    // выполняем для новых кубов до тех пор, пока их число не станет >= необходимого количества цветов
+    while (cuboids_size < numColors) {
+        if (cuboids.empty()) break;
+
         Cuboid current = cuboids.back();
         cuboids.pop_back();
+        --cuboids_size;
 
-        // РґРµР»РёРј РєСѓР± РЅР° РґРІР° РЅРѕРІС‹С…:
+        // делим куб на два новых:
         int dim = current.longestDimension();
-        double medianValue = current.median(dim);
+        int medianValue = current.median(dim);
 
         vector<Vec3b> leftColors, rightColors;
 
-        for (const auto& color : current.colors)
+        for (const auto& color : current.colors) {
             if (color[dim] < medianValue)
                 leftColors.push_back(color);
             else
                 rightColors.push_back(color);
+        }
 
-        if (!leftColors.empty())
+        if (!leftColors.empty()) {
             cuboids.emplace_back(leftColors);
-        if (!rightColors.empty())
+            ++cuboids_size;
+        }
+        if (!rightColors.empty()) {
             cuboids.emplace_back(rightColors);
+            ++cuboids_size;
+        }
+        if (leftColors.empty() || rightColors.empty()) {
+            popped.emplace_back(cuboids.back());
+            cuboids.pop_back();
+        }
     }
 
-    // СЃРѕСЃС‚Р°РІР»СЏРµРј РёС‚РѕРіРѕРІСѓСЋ РїР°Р»РёС‚СЂСѓ РёР· С†РІРµС‚РѕРІ, СЂР°РІРЅС‹С… СЃСЂРµРґРЅРёРј Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёРј С‚РѕС‡РµРє РІРЅСѓС‚СЂРё РєСѓР±РѕРІ
+    reverse(popped.begin(), popped.end());
+    cuboids.insert(cuboids.end(), popped.begin(), popped.end());
+
+    // составляем итоговую палитру из цветов, равных средним арифметическим точек внутри кубов
     for (const auto& cuboid : cuboids) {
         Vec3d averageColor(0, 0, 0);
         for (const auto& color : cuboid.colors)
@@ -102,8 +116,8 @@ Mat quantizeImage(const Mat& img, int numColors) {
     for (int y = 0; y < img.rows; ++y) {
         for (int x = 0; x < img.cols; ++x) {
             Vec3b color = img.at<Vec3b>(y, x);
-            
-            // РЅР°С…РѕРґРёРј Р±Р»РёР¶Р°Р№С€РёР№ С†РІРµС‚ РІ РїР°Р»РёС‚СЂРµ
+
+            // находим ближайший цвет в палитре
             int closestIndex = 0;
             double closestDistance = numeric_limits<double>::max();
 

@@ -60,8 +60,8 @@ int main() {
 
     // __TASK 3__
 
-    Mat img = imread("peaches.png");
-    int numColors = 16;
+    Mat img = imread("persiki.png");
+    int numColors = 40000;
     Mat output_img = quantizeImage(img, numColors);
 
     //imshow("Flood Fill", img);
@@ -70,6 +70,6 @@ int main() {
     waitKey(0);
     //imwrite("before_Flood_Fill1.png", img);
     //imwrite("Composite_CatmullRom_curve.png", img);
-    imwrite("peaches_quantized_16.png", output_img);
+    imwrite("persiki_quantized_40000.png", output_img);
     return 0;
 }

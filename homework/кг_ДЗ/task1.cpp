@@ -13,10 +13,10 @@ int GetPixel(const Mat& img, int x, int y) {
 
 
 void floodFill8(Mat& img, int x, int y, int newColor, int oldColor) {
-    if (oldColor == newColor) return; // если цвет уже совпадает
+    if (oldColor == newColor) return; // РµСЃР»Рё С†РІРµС‚ СѓР¶Рµ СЃРѕРІРїР°РґР°РµС‚
 
     stack<pair<int, int>> stack;
-    stack.push({ x, y }); // помещаем затравку в стек
+    stack.push({ x, y }); // РїРѕРјРµС‰Р°РµРј Р·Р°С‚СЂР°РІРєСѓ РІ СЃС‚РµРє
 
     while (!stack.empty()) {
         auto point = stack.top();
@@ -27,27 +27,27 @@ void floodFill8(Mat& img, int x, int y, int newColor, int oldColor) {
         int Xleft = x;
         int Xright = x;
 
-        // заполняем пиксели влево
+        // Р·Р°РїРѕР»РЅСЏРµРј РїРёРєСЃРµР»Рё РІР»РµРІРѕ
         while (Xleft >= 0 && GetPixel(img, Xleft, y) == oldColor) {
             SetPixel(img, Xleft, y, newColor & 0xFF, (newColor >> 8) & 0xFF, (newColor >> 16) & 0xFF);
             Xleft--;
         }
-        // заполняем пиксели вправо
+        // Р·Р°РїРѕР»РЅСЏРµРј РїРёРєСЃРµР»Рё РІРїСЂР°РІРѕ
         while (Xright < img.cols && GetPixel(img, Xright, y) == oldColor) {
             SetPixel(img, Xright, y, newColor & 0xFF, (newColor >> 8) & 0xFF, (newColor >> 16) & 0xFF);
             Xright++;
         }
 
-        // проверка строки выше (ось y увеличивается сверху вниз)
+        // РїСЂРѕРІРµСЂРєР° СЃС‚СЂРѕРєРё РІС‹С€Рµ (РѕСЃСЊ y СѓРІРµР»РёС‡РёРІР°РµС‚СЃСЏ СЃРІРµСЂС…Сѓ РІРЅРёР·)
         if (y > 0)
-            // держим в голове, что последним было действие Xleft--, так что на текущий момент Xleft это и есть Xleft - 1 (аналогично с Xright)
+            // РґРµСЂР¶РёРј РІ РіРѕР»РѕРІРµ, С‡С‚Рѕ РїРѕСЃР»РµРґРЅРёРј Р±С‹Р»Рѕ РґРµР№СЃС‚РІРёРµ Xleft--, С‚Р°Рє С‡С‚Рѕ РЅР° С‚РµРєСѓС‰РёР№ РјРѕРјРµРЅС‚ Xleft СЌС‚Рѕ Рё РµСЃС‚СЊ Xleft - 1 (Р°РЅР°Р»РѕРіРёС‡РЅРѕ СЃ Xright)
             for (int i = Xleft; i <= Xright; i++)
                 if (GetPixel(img, i, y - 1) == oldColor) {
                     stack.push({ i, y - 1 });
                     break;
                 }
 
-        // проверка строки ниже
+        // РїСЂРѕРІРµСЂРєР° СЃС‚СЂРѕРєРё РЅРёР¶Рµ
         if (y < img.rows - 1) 
             for (int i = Xleft; i <= Xright; i++)
                 if (GetPixel(img, i, y + 1) == oldColor) {

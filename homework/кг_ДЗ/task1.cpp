@@ -13,32 +13,46 @@ int GetPixel(const Mat& img, int x, int y) {
 
 
 void floodFill8(Mat& img, int x, int y, int newColor, int oldColor) {
-    static const int dx[8] = { 0, 1, 1, 1, 0, -1, -1, -1 };
-    static const int dy[8] = { -1, -1, 0, 1, 1, 1, 0, -1 };
-
-    if (oldColor == newColor) return; // РµСЃР»Рё С†РІРµС‚ СѓР¶Рµ СЃРѕРІРїР°РґР°РµС‚
+    if (oldColor == newColor) return; // если цвет уже совпадает
 
     stack<pair<int, int>> stack;
-    stack.push({ x, y }); // РїРѕРјРµС‰Р°РµРј Р·Р°С‚СЂР°РІРєСѓ РІ СЃС‚РµРє
+    stack.push({ x, y }); // помещаем затравку в стек
 
     while (!stack.empty()) {
-        pair<int, int> point = stack.top();
+        auto point = stack.top();
         stack.pop();
         x = point.first;
         y = point.second;
 
-        SetPixel(img, x, y,
-            newColor & 0xFF,
-            (newColor >> 8) & 0xFF,
-            (newColor >> 16) & 0xFF);
+        int Xleft = x;
+        int Xright = x;
 
-        for (int i = 0; i < 8; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-
-            if (nx >= 0 && nx < img.cols && ny >= 0 && ny < img.rows)
-                if (GetPixel(img, nx, ny) == oldColor)
-                    stack.push({ nx, ny });
+        // заполняем пиксели влево
+        while (Xleft >= 0 && GetPixel(img, Xleft, y) == oldColor) {
+            SetPixel(img, Xleft, y, newColor & 0xFF, (newColor >> 8) & 0xFF, (newColor >> 16) & 0xFF);
+            Xleft--;
         }
+        // заполняем пиксели вправо
+        while (Xright < img.cols && GetPixel(img, Xright, y) == oldColor) {
+            SetPixel(img, Xright, y, newColor & 0xFF, (newColor >> 8) & 0xFF, (newColor >> 16) & 0xFF);
+            Xright++;
+        }
+
+        // проверка строки выше (ось y увеличивается сверху вниз)
+        if (y > 0)
+            // держим в голове, что последним было действие Xleft--, так что на текущий момент Xleft это и есть Xleft - 1 (аналогично с Xright)
+            for (int i = Xleft; i <= Xright; i++)
+                if (GetPixel(img, i, y - 1) == oldColor) {
+                    stack.push({ i, y - 1 });
+                    break;
+                }
+
+        // проверка строки ниже
+        if (y < img.rows - 1) 
+            for (int i = Xleft; i <= Xright; i++)
+                if (GetPixel(img, i, y + 1) == oldColor) {
+                    stack.push({ i, y + 1 }); 
+                    break;
+                }
     }
 }

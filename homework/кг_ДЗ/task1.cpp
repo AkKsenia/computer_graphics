@@ -40,7 +40,7 @@ void floodFill8(Mat& img, int x, int y, int newColor, int oldColor) {
 
         // проверка строки выше (ось y увеличивается сверху вниз)
         if (y > 0)
-            // держим в голове, что последним было действие Xleft--, так что на текущий момент Xleft это и есть Xleft - 1 (аналогично с Xright)
+            // держим в голове, что последним было действие Xleft--, так что на текущий момент Xleft это и есть нужная нам граница Xleft - 1 (аналогично с Xright)
             for (int i = Xleft; i <= Xright; i++)
                 if (GetPixel(img, i, y - 1) == oldColor) {
                     stack.push({ i, y - 1 });

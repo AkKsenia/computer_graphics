@@ -61,7 +61,7 @@ int main() {
     // __TASK 3__
 
     Mat img = imread("persiki.png");
-    int numColors = 900;
+    int numColors = 600;
     Mat output_img = quantizeImage(img, numColors);
 
     //imshow("Flood Fill", img);
@@ -70,7 +70,7 @@ int main() {
      waitKey(0);
     //imwrite("Flood_Fill1.png", img);
     //imwrite("Composite_CatmullRom_curve.png", img);
-    imwrite("persiki_quantized_900.png", output_img);
+    imwrite("persiki_quantized_600.png", output_img);
 
     return 0;
 }

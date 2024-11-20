@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <queue>
 
 using namespace cv;
 using namespace std;

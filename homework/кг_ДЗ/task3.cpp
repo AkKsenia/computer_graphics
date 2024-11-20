@@ -51,8 +51,6 @@ void medianCut(const vector<Vec3b>& colors, vector<Vec3b>& palette, int numColor
 
     // выполняем для новых кубов до тех пор, пока их число не станет >= необходимого количества цветов
     while (cuboids.size() < numColors) {
-        if (cuboids.empty()) break;
-
         Cuboid current = cuboids.front();
         cuboids.pop();
 

@@ -67,7 +67,7 @@ int main() {
     //imshow("Flood Fill", img);
     //imshow("Composite Catmull-Rom curve", img);
     imshow("Quantized Image", output_img);
-     waitKey(0);
+    waitKey(0);
     //imwrite("Flood_Fill1.png", img);
     //imwrite("Composite_CatmullRom_curve.png", img);
     imwrite("persiki_quantized_600.png", output_img);
